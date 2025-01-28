@@ -6,12 +6,12 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --inspect --env-file .env ./src/index.js",
-    "host": "nodemon --inspect --env-file .env ./src/index.js --host",
-    "start": "node ./src/index.js",
-    "migrate": "env $(cat .env) knex migrate:latest --knexfile ./src/database/knexfile.cjs",
-    "rollback": "env $(cat .env) knex migrate:rollback --knexfile ./src/database/knexfile.cjs",
-    "create-migration": "knex migrate:make $npm_config_name --migrations-directory src/database/migrations"
+    "dev": "nodemon --inspect --env-file .env ./api/index.js",
+    "host": "nodemon --inspect --env-file .env ./api/index.js --host",
+    "start": "node ./api/index.js",
+    "migrate": "env $(cat .env) knex migrate:latest --knexfile ./api/database/knexfile.cjs",
+    "rollback": "env $(cat .env) knex migrate:rollback --knexfile ./api/database/knexfile.cjs",
+    "create-migration": "knex migrate:make $npm_config_name --migrations-directory api/database/migrations"
   },
   "author": "",
   "license": "ISC",
