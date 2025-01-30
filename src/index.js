@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import auth_route from "./routes/auth_route.js";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
@@ -14,6 +14,7 @@ app.use(
       process.env.LOCALHOST_CLIENT_URL,
       process.env.STAGING_CLIENT_URL,
       process.env.PRODUCTION_CLIENT_URL,
+      "https://tseklis.app.viascari.com",
     ],
     credentials: true,
   })
