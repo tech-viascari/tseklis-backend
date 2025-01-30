@@ -1,7 +1,5 @@
-import User from "../models/User.js";
 import checkAuthorization from "../utils/authorization.js";
 import { decodeToken, encodeToken } from "../utils/token.js";
-import jwt from "jsonwebtoken";
 
 export const authCheck = (req, res) => {
   const payload = checkAuthorization(req.cookies);
@@ -9,30 +7,7 @@ export const authCheck = (req, res) => {
   if (payload == null) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  res
-    .status(200)
-    .json({ message: "Authorized", payload: payload.access_token });
-  return;
-
-  if (checkAuthorization(req.cookies)) {
-  }
-  const access_token = req.cookies.access_token; // Access the JWT from the cookie
-
-  if (!access_token) {
-    return res.status(403).json({ message: "No token provided" });
-  }
-
-  const payload1 = decodeToken(access_token);
-
-  if (payload == null) {
-    return res.status(403).json({ message: "Invalid token" });
-  }
-
-  res.status(200).json({
-    message: "You are authorized!",
-    access_token,
-    payload,
-  });
+  return res.status(200).json({ message: "Authorized" });
 };
 
 export const authenticate = (req, res) => {
@@ -57,7 +32,7 @@ export const authenticate = (req, res) => {
     path: "/", // The cookie is available on the entire website
   });
 
-  res.json({ message: "Logged in successfully", payload });
+  return res.json({ message: "Logged in successfully", payload });
 };
 
 export const logout = (req, res) => {
@@ -67,5 +42,5 @@ export const logout = (req, res) => {
     secure: process.env.NODE_ENV === "production",
   });
   // Respond to indicate successful logout
-  res.status(200).json("Logged out successfully");
+  return res.status(200).json("Logged out successfully");
 };

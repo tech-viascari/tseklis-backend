@@ -13,8 +13,7 @@ app.use(
     origin: [
       process.env.LOCALHOST_CLIENT_URL,
       process.env.STAGING_CLIENT_URL,
-      process.env.PRODUCTION_CLIENT_URL,
-      "https://tseklis.app.viascari.com",
+      process.env.PRODUCTION_CLIENT_URL
     ],
     credentials: true,
   })
