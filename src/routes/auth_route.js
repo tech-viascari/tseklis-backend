@@ -5,9 +5,6 @@ import {
   logout,
 } from "../controllers/auth_controller.js";
 import { authMiddleware } from "../middlewares/auth_middleware.js";
-import checkAuthorization from "../utils/authorization.js";
-import { decodeToken } from "../utils/token.js";
-import jwt from "jsonwebtoken";
 const router = express.Router();
 
 router.get("/auth/check", authCheck);
