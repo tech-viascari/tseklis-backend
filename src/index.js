@@ -10,7 +10,11 @@ const PORT = 3000;
 
 app.use(
   cors({
-    origin: [process.env.LOCALHOST_CLIENT_URL, process.env.STAGING_CLIENT_URL],
+    origin: [
+      process.env.LOCALHOST_CLIENT_URL,
+      process.env.STAGING_CLIENT_URL,
+      process.env.PRODUCTION_CLIENT_URL,
+    ],
     credentials: true,
   })
 );
