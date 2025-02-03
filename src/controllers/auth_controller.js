@@ -1,12 +1,6 @@
-import checkAuthorization from "../utils/authorization.js";
-import { decodeToken, encodeToken } from "../utils/token.js";
+import { encodeToken } from "../utils/token.js";
 
 export const authCheck = (req, res) => {
-  const payload = checkAuthorization(req.cookies);
-
-  if (payload == null) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
   return res.status(200).json({ message: "Authorized" });
 };
 
