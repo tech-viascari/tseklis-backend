@@ -5,10 +5,11 @@ import {
   logout,
 } from "../controllers/auth_controller.js";
 import { authMiddleware } from "../middlewares/auth_middleware.js";
+import { checkPayloadMiddleware } from "../middlewares/global_middleware.js";
 const router = express.Router();
 
-router.get("/auth/check", authCheck);
+router.get("/auth/check", checkPayloadMiddleware, authCheck);
 router.post("/authenticate", authMiddleware, authenticate);
-router.post("/logout", authMiddleware, logout);
+router.post("/logout", logout);
 
 export default router;

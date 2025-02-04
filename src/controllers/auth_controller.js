@@ -5,11 +5,6 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
 export const authCheck = (req, res) => {
-  const payload = checkAuthorization(req.cookies);
-
-  if (payload == null) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
   return res.status(200).json({ message: "Authorized" });
 };
 
