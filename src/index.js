@@ -13,7 +13,7 @@ app.use(
     origin: [
       process.env.LOCALHOST_CLIENT_URL,
       process.env.STAGING_CLIENT_URL,
-      process.env.PRODUCTION_CLIENT_URL
+      process.env.PRODUCTION_CLIENT_URL,
     ],
     credentials: true,
   })
@@ -23,10 +23,6 @@ app.use(express.json({ limit: "20mb" })); //file size limit
 app.use(cookieParser());
 
 app.use(auth_route);
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
