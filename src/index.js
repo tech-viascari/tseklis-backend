@@ -26,10 +26,6 @@ app.use(cookieParser());
 app.use(auth_route);
 app.use(quotes_route);
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
