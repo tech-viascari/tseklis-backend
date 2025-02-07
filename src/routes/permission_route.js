@@ -9,14 +9,6 @@ import {
 } from "../controllers/permissions_controller.js";
 const router = express.Router();
 
-router.get("/permissions", checkPayloadMiddleware, getAllPermissions);
-router.post("/permissions", checkPayloadMiddleware, addPermission);
-router.delete(
-  "/permission/:permission_id",
-  checkPayloadMiddleware,
-  deletePermission
-);
-
 router
   .route("/permissions")
   .get(checkPayloadMiddleware, getAllPermissions)
