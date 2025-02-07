@@ -11,12 +11,12 @@ import { userMiddleware } from "../middlewares/users_middleware.js";
 const router = express.Router();
 
 // router.get("/users", checkPayloadMiddleware, fetchUsers);
-router.route("/users").get(fetchUsers).post(userMiddleware, addUser);
+router.route("/users").get(fetchUsers).post(checkPayloadMiddleware, userMiddleware, addUser);
 
 router
   .route("/user/:user_id")
-  .get(fetchUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+  .get(checkPayloadMiddleware, fetchUser)
+  .patch(checkPayloadMiddleware, updateUser)
+  .delete(checkPayloadMiddleware, deleteUser);
 
 export default router;

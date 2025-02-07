@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import { encodeToken } from "../utils/token.js";
 
 export const fetchUsers = async (req, res) => {
   const users = await new User().fetchAll();
@@ -24,7 +25,19 @@ export const addUser = async (req, res) => {
   try {
     const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
     const hash = bcrypt.hashSync(req.body.password, salt);
-    const user = await new User({ ...req.body, password: hash }).add();
+
+    const access_token = encodeToken(
+      "new_account",
+      { email: req.body.email },
+      "1h"
+    );
+
+    const user = await new User({
+      ...req.body,
+      password: hash,
+      access_token,
+      refresh_token: access_token,
+    }).add();
 
     if (user) {
       return res.status(200).json({ user });
