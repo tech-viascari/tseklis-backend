@@ -5,6 +5,9 @@ import cookieParser from "cookie-parser";
 
 import auth_route from "./routes/auth_route.js";
 import quotes_route from "./routes/quotes_route.js";
+import users_route from "./routes/user_route.js";
+import permission_route from "./routes/permission_route.js";
+import roles_route from "./routes/roles_route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +28,9 @@ app.use(cookieParser());
 
 app.use(auth_route);
 app.use(quotes_route);
+app.use(users_route);
+app.use(permission_route);
+app.use(roles_route);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

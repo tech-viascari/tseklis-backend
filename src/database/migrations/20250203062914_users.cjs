@@ -14,6 +14,7 @@ exports.up = function (knex) {
       table.datetime("last_login").notNullable();
       table.string("password").notNullable();
       table.string("status").notNullable();
+      table.text("picture").nullable().defaultTo("");
       table.text("access_token").notNullable().unique();
       table.text("refresh_token").notNullable().unique();
       table.timestamps(true, true);
