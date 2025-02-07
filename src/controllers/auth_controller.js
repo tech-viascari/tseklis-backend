@@ -29,8 +29,6 @@ export const authCheck = async (req, res) => {
 export const authenticate = async (req, res) => {
   const { email, password } = req.body;
 
-  
-
   try {
     const user = await new User().fetch({ email });
 
@@ -89,7 +87,6 @@ export const authenticate = async (req, res) => {
       throw Error("User does not exist!");
     }
   } catch (error) {
-    
     return res.status(500).json({ status: "failed", message: error.message });
   }
 };
