@@ -12,6 +12,7 @@ class User {
     last_login = new Date(),
     password = "",
     status = "Active",
+    picture = "",
     access_token = "",
     refresh_token = "",
     created_at = new Date(),
@@ -26,6 +27,7 @@ class User {
     this.last_login = last_login;
     this.password = password;
     this.status = status;
+    this.picture = picture;
     this.access_token = access_token;
     this.refresh_token = refresh_token;
     this.created_at = created_at;
@@ -33,7 +35,7 @@ class User {
   }
 
   // Fetch all records
-  static async fetchAll() {
+  async fetchAll() {
     return await db("users").select("*");
   }
 
@@ -64,7 +66,7 @@ class User {
   }
 
   // Delete a record by ID
-  static async delete(user_id) {
+  async delete(user_id) {
     return await db("users").where({ user_id }).del();
   }
 
