@@ -4,15 +4,24 @@ import { encodeToken } from "../utils/token.js";
 
 export const fetchUsers = async (req, res) => {
   const users = await new User().fetchAll();
-  return res.status(200).json(users);
+
+  if (users.length != 0) {
+    const filteredUsers = users.map((user) => {
+      const { password, access_token, refresh_token, ...filteredUser } = user;
+      return filteredUser;
+    });
+    return res.status(200).json(filteredUsers);
+  }
+  return res.status(200).json([]);
 };
 
 export const fetchUser = async (req, res) => {
   const { user_id } = req.params;
   try {
     const user = await new User().fetch({ user_id });
+    const { password, access_token, refresh_token, ...filteredUser } = user;
     if (user) {
-      return res.status(200).json(user);
+      return res.status(200).json({ user: filteredUser });
     } else {
       throw Error("User ID is not found.");
     }
@@ -37,7 +46,7 @@ export const addUser = async (req, res) => {
       password: hash,
       access_token,
       refresh_token: access_token,
-    }).add();
+    }).add(req.body.roles);
 
     if (user) {
       return res.status(200).json({ user });
@@ -54,9 +63,17 @@ export const updateUser = async (req, res) => {
   try {
     const user = await new User().fetch({ user_id });
     if (user) {
-      const updatedUser = new User({ ...user, ...req.body });
+      let { password, ...filteredUser } = req.body;
 
-      const update = await updatedUser.update();
+      if (req.body.password != "") {
+        const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
+        const hash = bcrypt.hashSync(req.body.password, salt);
+        filteredUser.password = hash;
+      }
+
+      const updatedUser = new User({ ...user, ...filteredUser });
+
+      const update = await updatedUser.update(req.body.roles);
 
       if (update) {
         return res.status(200).json({ status: "success", user: updatedUser });
@@ -77,7 +94,7 @@ export const deleteUser = async (req, res) => {
     const user = await new User().fetch({ user_id });
 
     if (user) {
-      const deleteUser = new User().delete(user.user_id);
+      const deleteUser = new User().delete({ user_id });
       if (deleteUser) {
         return res.status(200).json({ status: "success", user: deleteUser });
       } else {
