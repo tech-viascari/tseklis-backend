@@ -17,6 +17,10 @@ export const userMiddleware = async (req, res, next) => {
       errors.last_name = "Last name is required";
     }
 
+    if (req.body.roles.length == 0) {
+      errors.roles = "Role is required";
+    }
+
     const user = await new User().fetch({ email: req.body.email });
 
     if (user) {

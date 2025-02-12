@@ -43,14 +43,12 @@ export const authenticate = async (req, res) => {
         );
         const updatedUser = new User({
           ...user,
+          last_login: new Date(),
           access_token,
           refresh_token: access_token,
         });
 
-        let response = await updatedUser.update();
-
-        if (response) {
-        }
+        let response = await updatedUser.update([]);
 
         if (response) {
           const returning = {
@@ -116,11 +114,12 @@ export const googleAuth = async (req, res) => {
       const updatedUser = new User({
         ...user,
         picture: googleUser.picture,
+        last_login: new Date(),
         access_token,
         refresh_token: access_token,
       });
 
-      let response = await updatedUser.update();
+      let response = await updatedUser.update([]);
 
       if (response) {
         const returning = {

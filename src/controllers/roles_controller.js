@@ -1,4 +1,5 @@
 import db from "../database/db.js";
+import Role from "../models/Role.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
@@ -106,26 +107,8 @@ export const seeders = async (req, res) => {
 
 export const getAllRoles = async (req, res) => {
   try {
-    let roles = await db("roles").select("*");
-    let getPermissions = await Promise.all(
-      roles.map(async (role, index) => {
-        let permissions = await db("role_permissions")
-          .select(
-            "role_permission_id",
-            "permission_name",
-            "permissions.permission_id"
-          )
-          .innerJoin(
-            "permissions",
-            "permissions.permission_id",
-            "role_permissions.permission_id"
-          )
-          .where("role_id", role.role_id);
-        role.permissions = permissions;
-        return role;
-      })
-    );
-    res.status(200).json({ success: true, roles: getPermissions });
+    let roles = await new Role().fetchAll();
+    res.status(200).json(roles);
   } catch (error) {
     res
       .status(500)
@@ -133,31 +116,30 @@ export const getAllRoles = async (req, res) => {
   }
 };
 
-export const addRole = async (req, res) => {
-  const { role_name, permissions } = req.body;
+export const getRole = async (req, res) => {
+  const { role_id } = req.params;
 
   try {
-    let newRole = await db("roles")
-      .insert({ role_name: role_name })
-      .returning(["role_id", "role_name"]);
+    let role = await new Role().fetch({ role_id });
 
-    if (newRole.length == 1) {
-      permissions.map(async (permission) => {
-        await assignPermission({
-          role_id: newRole[0].role_id,
-          permission_id: permission.permission_id,
-        });
-      });
+    if (role) {
+      res.status(200).json({ role });
+    } else {
+      throw Error("Role ID is not found.");
     }
-
-    res.status(200).json({
-      success: true,
-      result: {
-        role_name: role_name,
-        role_id: newRole[0].role_id,
-        permissions: permissions,
-      },
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
     });
+  }
+};
+
+export const addRole = async (req, res) => {
+  try {
+    const role = new Role({ ...req.body }).add(req.body.permissions);
+    return res.status(200).json({ body: role });
   } catch (error) {
     res
       .status(500)
@@ -167,52 +149,39 @@ export const addRole = async (req, res) => {
 
 export const updateRole = async (req, res) => {
   const { role_id } = req.params;
-  const { role_name, permissions } = req.body;
   try {
-    let toUpdate = {
-      role_name: role_name,
-    };
-    const updateRole = await db("roles")
-      .update(toUpdate)
-      .where("role_id", role_id)
-      .returning(["role_id", "role_name"]);
+    const role = await new Role().fetch({ role_id });
 
-    //delete all permissions associated with the role
-    const deleteRolePermissions = await db("role_permissions")
-      .where("role_id", role_id)
-      .delete();
-
-    // //add all permissions that is from the req.body to update the permissions
-    permissions.map(async (permission) => {
-      await assignPermission({
-        role_id: role_id,
-        permission_id: permission.permission_id,
-      });
-    });
-
-    res.status(200).json({ success: true, result: updateRole });
+    if (role) {
+      const updateRole = new Role({ ...req.body }).update(req.body.permissions);
+      return res.status(200).json({ success: true, role, updateRole });
+    } else {
+      throw Error("Role ID is not found.");
+    }
   } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ success: false, error: "Internal Server Error", err: error });
+    return res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+      err: error.message,
+    });
   }
 };
 
 export const deleteRole = async (req, res) => {
   const { role_id } = req.params;
-  try {
-    const deleteRolePermissions = await db("role_permissions")
-      .where("role_id", role_id)
-      .delete();
-    const deleteRole = await db("roles").where("role_id", role_id).delete();
 
-    res
-      .status(200)
-      .json({ success: true, result: { deleteRole, deleteRolePermissions } });
+  try {
+    const role = await new Role().fetch({ role_id });
+    if (role) {
+      await new Role().delete({ role_id });
+      return res
+        .status(200)
+        .json({ success: true, message: "Record deleted successfully." });
+    } else {
+      throw Error("Role ID is not found.");
+    }
   } catch (error) {
-    console.log(error);
-    res
+    return res
       .status(500)
       .json({ success: false, error: "Internal Server Error", err: error });
   }
