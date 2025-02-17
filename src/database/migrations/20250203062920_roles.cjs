@@ -19,5 +19,7 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists("roles");
+  return knex.schema.dropTableIfExists("roles").then(() => {
+    console.log(`roles table dropped`);
+  });;
 };

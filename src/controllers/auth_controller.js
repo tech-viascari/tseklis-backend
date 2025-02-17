@@ -11,19 +11,30 @@ const oAuth2Client = new OAuth2Client(
 );
 
 export const authCheck = async (req, res) => {
-  const user = await new User().fetch({
-    access_token: req.cookies.access_token,
-  });
-
-  const {
-    password,
-    access_token,
-    refresh_token,
-    created_at,
-    updated_at,
-    ...filteredUser
-  } = user;
-  return res.status(200).json({ message: "Authorized", user: filteredUser });
+  try {
+    const user = await new User().fetch({
+      access_token: req.cookies.access_token,
+    });
+    if (user) {
+      const {
+        password,
+        access_token,
+        refresh_token,
+        created_at,
+        updated_at,
+        ...filteredUser
+      } = user;
+      return res
+        .status(200)
+        .json({ message: "Authorized", user: filteredUser });
+    } else {
+      throw Error("User not found.");
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Unauthorized", error: error.message });
+  }
 };
 
 export const authenticate = async (req, res) => {

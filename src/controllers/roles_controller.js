@@ -1,11 +1,12 @@
 import db from "../database/db.js";
+import Permission from "../models/Permission.js";
 import Role from "../models/Role.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
 const ROLES_LIST = ["Admin", "Manager", "User"];
 
-const SUPER_ADMIN_PERMISSIONS_LIST = [
+const DEFAULT_PERMISSIONS_LIST = [
   "View Users",
   "Update Users",
   "Delete Users",
@@ -48,29 +49,31 @@ export const seeders = async (req, res) => {
   try {
     const roles = await db("roles").select("*");
     if (roles.length === 0) {
-      const superAdmin = await addNewRole({ role_name: "Super Administrator" });
-      const manager = await addNewRole({ role_name: "Compliance Manager" });
-      const officer = await addNewRole({ role_name: "Compliance Officer" });
-      const associate = await addNewRole({ role_name: "Compliance Associate" });
-      const adminIT = await addNewRole({ role_name: "IT Administrator" });
-
-      let superAdminPermissions = SUPER_ADMIN_PERMISSIONS_LIST.map(
-        (permission) => {
-          return {
-            permission_name: permission,
-          };
-        }
-      );
-
-      let addedPermissions = await addNewPermission(superAdminPermissions);
-
-      //Assign permissions to super admin
-      addedPermissions.map(async (permission) => {
-        await assignPermission({
-          role_id: superAdmin[0].role_id,
-          permission_id: permission.permission_id,
-        });
+      DEFAULT_PERMISSIONS_LIST.forEach((permission) => {
+        new Permission({ permission_name: permission }).add();
       });
+
+      const permissions = await new Permission().fetchAll();
+
+      const superAdmin = await new Role({
+        role_name: "Super Administrator",
+      }).add(permissions);
+
+      const manager = await new Role({
+        role_name: "Compliance Manager",
+      }).add();
+
+      const officer = await new Role({
+        role_name: "Compliance Officer",
+      }).add();
+
+      const associate = await new Role({
+        role_name: "Compliance Associate",
+      }).add();
+
+      const adminIT = await new Role({
+        role_name: "IT Administrator",
+      }).add();
 
       const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
       const hash = bcrypt.hashSync(process.env.TECH_PW, salt);
@@ -80,16 +83,9 @@ export const seeders = async (req, res) => {
         last_name: "Viascari",
         email: process.env.TECH_EMAIL,
         password: hash,
-      });
+      }).add(superAdmin);
 
-      //Select admin user
-      let administrator = await newUser.add();
-
-      if (administrator.length > 0) {
-        await assignRole({
-          role_id: superAdmin[0].role_id,
-          user_id: administrator[0].user_id,
-        });
+      if (newUser) {
         res.status(200).json({ success: true });
       } else {
         res.status(200).json({
@@ -98,10 +94,12 @@ export const seeders = async (req, res) => {
         });
       }
     } else {
-      res.status(200).json({ success: false, roles: roles });
+      return res.status(200).json({ success: true, roles: roles });
     }
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error", err: error });
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", err: error.message });
   }
 };
 

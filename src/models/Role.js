@@ -68,7 +68,7 @@ class Role {
   }
 
   // Add a new record
-  async add(permissions) {
+  async add(permissions = []) {
     // Exclude the `role_id`, `created_at`,`updated_at` from the insert data
     const { role_id, created_at, updated_at, ...dataToInsert } = this;
 
@@ -103,7 +103,7 @@ class Role {
           permission_id: permission.permission_id,
         });
       });
-      
+
       return await db(DB_NAME)
         .where({ role_id: this.role_id })
         .update(fieldsToUpdate)
