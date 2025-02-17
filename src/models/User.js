@@ -44,27 +44,31 @@ class User {
           .innerJoin("roles", "roles.role_id", "user_roles.role_id")
           .where("user_id", user.user_id);
 
-        const permissions = await Promise.all(
-          roles.map(async (role) => {
-            let permissions = await db("roles_permissions")
-              .select(
-                "roles_permissions_id",
-                "permission_name",
-                "permissions.permission_id"
-              )
-              .innerJoin(
-                "permissions",
-                "permissions.permission_id",
-                "roles_permissions.permission_id"
-              )
-              .where("role_id", role.role_id);
+        if (roles.length != 0) {
+          const permissions = await Promise.all(
+            roles.map(async (role) => {
+              let permissions = await db("roles_permissions")
+                .select(
+                  "roles_permissions_id",
+                  "permission_name",
+                  "permissions.permission_id"
+                )
+                .innerJoin(
+                  "permissions",
+                  "permissions.permission_id",
+                  "roles_permissions.permission_id"
+                )
+                .where("role_id", role.role_id);
 
-            return permissions;
-          })
-        );
+              return permissions;
+            })
+          );
+          user.permissions = permissions[0];
+        } else {
+          user.permissions = [];
+        }
 
         user.roles = roles;
-        user.permissions = permissions[0];
 
         const { password, access_token, refresh_token, ...filteredUser } = user;
 
@@ -84,27 +88,31 @@ class User {
         .innerJoin("roles", "roles.role_id", "user_roles.role_id")
         .where("user_id", user.user_id);
 
-      let permissions = await Promise.all(
-        roles.map(async (role) => {
-          const permissions = await db("roles_permissions")
-            .select(
-              "roles_permissions_id",
-              "permission_name",
-              "roles_permissions.permission_id"
-            )
-            .innerJoin(
-              "permissions",
-              "permissions.permission_id",
-              "roles_permissions.permission_id"
-            )
-            .where("role_id", role.role_id);
+      if (roles.length != 0) {
+        let permissions = await Promise.all(
+          roles.map(async (role) => {
+            const permissions = await db("roles_permissions")
+              .select(
+                "roles_permissions_id",
+                "permission_name",
+                "roles_permissions.permission_id"
+              )
+              .innerJoin(
+                "permissions",
+                "permissions.permission_id",
+                "roles_permissions.permission_id"
+              )
+              .where("role_id", role.role_id);
 
-          return permissions;
-        })
-      );
+            return permissions;
+          })
+        );
+        user.permissions = permissions[0];
+      } else {
+        user.permissions = [];
+      }
 
       user.roles = roles;
-      user.permissions = permissions[0];
     }
     return user;
   }

@@ -13,7 +13,10 @@ const router = express.Router();
 
 router.post("/roles/seeders", seeders);
 
-router.route("/roles").get(getAllRoles).post(addRole);
+router
+  .route("/roles")
+  .get(checkPayloadMiddleware, getAllRoles)
+  .post(checkPayloadMiddleware, addRole);
 
 router
   .route("/role/:role_id")
