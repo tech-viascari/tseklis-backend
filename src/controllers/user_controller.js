@@ -19,8 +19,8 @@ export const fetchUser = async (req, res) => {
   const { user_id } = req.params;
   try {
     const user = await new User().fetch({ user_id });
-    const { password, access_token, refresh_token, ...filteredUser } = user;
     if (user) {
+      const { password, access_token, refresh_token, ...filteredUser } = user;
       return res.status(200).json({ user: filteredUser });
     } else {
       throw Error("User ID is not found.");

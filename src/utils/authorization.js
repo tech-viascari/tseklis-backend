@@ -6,7 +6,7 @@ const checkAuthorization = (cookies) => {
       cookies.access_token == "postman" &&
       process.env.ENVIRONMENT == "development"
     ) {
-      return true;
+      return "postman";
     }
     let token = decodeToken(cookies.access_token);
     return token;
