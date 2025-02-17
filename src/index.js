@@ -8,6 +8,7 @@ import quotes_route from "./routes/quotes_route.js";
 import users_route from "./routes/user_route.js";
 import permission_route from "./routes/permission_route.js";
 import roles_route from "./routes/roles_route.js";
+import entity_enrollment_route from "./routes/entity_enrollment_route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,6 +32,7 @@ app.use(quotes_route);
 app.use(users_route);
 app.use(permission_route);
 app.use(roles_route);
+app.use(entity_enrollment_route);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
