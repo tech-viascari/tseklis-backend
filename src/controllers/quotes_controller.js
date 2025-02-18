@@ -1,6 +1,6 @@
-import moment from "moment";
 import db from "../database/db.js";
 import Quote from "../models/Quote.js";
+import axios from "axios";
 
 export const getAllQuotes = async (req, res) => {
   try {
@@ -123,6 +123,31 @@ export const deleteQuote = async (req, res) => {
       error: "Internal Server Error",
       err: error.message,
     });
+  }
+};
+
+export const generateQuote = async (req, res) => {
+  if (!req.query.quote_id) {
+    res.sendStatus(400);
+    return;
+  }
+
+  const url =
+    "https://script.google.com/a/macros/viascari.com/s/AKfycbzPp-Mdohq9MIz9N8n8vcXj_08vFzRDKWIoFuQMre-xWECrZsUdA1gDbTyPQetr2DzhcQ/exec";
+
+  try {
+    let response = await axios.get(url, {
+      params: {
+        quote_id: req.query.quote_id,
+      },
+    });
+
+    if (response.status === 200) {
+      res.send(response.data);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
   }
 };
 
