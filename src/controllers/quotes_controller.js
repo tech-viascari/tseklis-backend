@@ -50,7 +50,7 @@ export const addQuote = async (req, res) => {
     //   "MMDDYYYYhhmmssA"
     // )}`;
 
-    let quote_name = `${data.service_type}`;
+    let quote_name = `${data.subject}`;
 
     const timestamp = new Quote().getQuoteStatus({
       status: req.body.timestamp.status,

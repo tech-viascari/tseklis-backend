@@ -15,11 +15,13 @@ const QuoteFormDataState = {
   recipient_address: "",
   recipient_email: "",
   recipient_name: "",
-  service_type: "",
+  subject: "",
+  scope: "",
   billing_account: "Viascari, Inc.",
   scope_of_work: [],
   due_date: "",
   currency: "PHP",
+  include_vat: "Yes",
 };
 
 const QuoteAttachmentsState = {
