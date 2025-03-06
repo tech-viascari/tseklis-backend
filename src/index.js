@@ -33,6 +33,7 @@ app.use(users_route);
 app.use(permission_route);
 app.use(roles_route);
 app.use(legal_entities_route);
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
