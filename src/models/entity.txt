@@ -1,0 +1,221 @@
+import e from "cors";
+import db from "../database/db.js";
+
+const DB_NAME = "entity_enrollment";
+const DB_PRIMARY_KEY = "entity_id";
+
+// Entity model
+class Entity {
+    constructor({
+        entity_id = "",
+        business_type = "",
+        client_type = "",
+        company_name = "",
+        company_address = "",
+        type_of_company = "",
+        corporate_tin = "",
+        sec_registration_number = "",
+        official_email = "",
+        alternative_email = "",
+        official_contact_number = "",
+        alternative_contact_number = "",
+        company_logo = "",
+        created_at = new Date(),
+        updated_at = new Date(),
+    } = {}) {
+        this.entity_id = entity_id;
+        this.business_type = business_type;
+        this.client_type = client_type;
+        this.company_name = company_name;
+        this.company_address = company_address;
+        this.type_of_company = type_of_company;
+        this.corporate_tin = corporate_tin;
+        this.sec_registration_number = sec_registration_number;
+        this.official_email = official_email;
+        this.alternative_email = alternative_email;
+        this.official_contact_number = official_contact_number;
+        this.alternative_contact_number = alternative_contact_number;
+        this.company_logo = company_logo;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
+    }
+
+// Fetch all records
+    async fetchAll() {
+        let entities = await db(DB_NAME)
+        .leftJoin('officer_information', 'entity_enrollment.entity_id', 'officer_information.entity_id')
+        .select('entity_enrollment.*', 'officer_information.*');
+    
+        // Group the results by entity_id
+        const groupedEntities = entities.reduce((acc, entity) => {
+        const entityId = entity.entity_id;
+        if (!acc[entityId]) {
+            acc[entityId] = {
+            entity_id: entity.entity_id,
+            business_type: entity.business_type,
+            client_type: entity.client_type,
+            company_name: entity.company_name,
+            company_address: entity.company_address,
+            type_of_company: entity.type_of_company,
+            corporate_tin: entity.corporate_tin,
+            sec_registration_number: entity.sec_registration_number,
+            official_email: entity.official_email,
+            alternative_email: entity.alternative_email,
+            official_contact_number: entity.official_contact_number,
+            alternative_contact_number: entity.alternative_contact_number,
+            company_logo: entity.company_logo,
+            created_at: entity.created_at,
+            updated_at: entity.updated_at,
+            officer_information: []
+            };
+        }
+        if (entity.officer_id) {
+            const officerInfo = {
+            officer_id: entity.officer_id,
+            officer_name: entity.officer_name,
+            current_residence: entity.current_residence,
+            nationality: entity.nationality,
+            incorporator: entity.incorporator,
+            board: entity.board,
+            gender: entity.gender,
+            stock_holder: entity.stock_holder,
+            officer: entity.officer,
+            executive_committee: entity.executive_committee,
+            tax_identification_number: entity.tax_identification_number,
+            created_at: entity.created_at,
+            updated_at: entity.updated_at
+            };
+            console.log('Officer Information:', officerInfo); // Log the officer information
+            acc[entityId].officer_information.push(officerInfo);
+        }
+        return acc;
+        }, {});
+    
+        // Convert the grouped entities object to an array
+        const result = Object.values(groupedEntities);
+    
+        console.log(result);
+    
+        return result;
+    }
+    
+
+// Fetch a record by ID
+    async fetchById(entity_id) {
+        let entity = await db(DB_NAME)
+        .leftJoin('officer_information', 'entity_enrollment.entity_id', 'officer_information.entity_id')
+        .select('entity_enrollment.*', 'officer_information.*')
+        .where('entity_enrollment.entity_id', entity_id);
+    
+        if (entity.length === 0) {
+        return null;
+        }
+    
+        console.log(entity);
+    
+        // Group the officer information
+        const groupedEntity = entity.reduce((acc, item) => {
+        if (!acc) {
+            acc = {
+            entity_id: item.entity_id,
+            business_type: item.business_type,
+            client_type: item.client_type,
+            company_name: item.company_name,
+            company_address: item.company_address,
+            type_of_company: item.type_of_company,
+            corporate_tin: item.corporate_tin,
+            sec_registration_number: item.sec_registration_number,
+            official_email: item.official_email,
+            alternative_email: item.alternative_email,
+            official_contact_number: item.official_contact_number,
+            alternative_contact_number: item.alternative_contact_number,
+            company_logo: item.company_logo,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            officer_information: []
+            };
+        }
+        if (item.officer_id) {
+            acc.officer_information.push({
+            officer_id: item.officer_id,
+            officer_name: item.officer_name,
+            current_residence: item.current_residence,
+            nationality: item.nationality,
+            incorporator: item.incorporator,
+            board: item.board,
+            gender: item.gender,
+            stock_holder: item.stock_holder,
+            officer: item.officer,
+            executive_committee: item.executive_committee,
+            tax_identification_number: item.tax_identification_number,
+            created_at: item.created_at,
+            updated_at: item.updated_at
+            });
+        }
+        return acc;
+        }, null);
+    
+        console.log(groupedEntity);
+    
+        return groupedEntity;
+    }
+
+
+// Add a new record
+    async add() {
+        // Exclude the `entity_id`, `created_at`, `updated_at` from the insert data
+        const { entity_id, created_at, updated_at, officer_information, ...dataToInsert } = this;
+        
+        // Insert the entity data
+        const insertedEntity = await db(DB_NAME).insert(dataToInsert).returning('*');
+        const entityId = insertedEntity[0].entity_id;
+    
+        // Insert the officer information if provided
+        if (officer_information && officer_information.length > 0) {
+        const officerData = officer_information.map(officer => ({
+            ...officer,
+            entity_id: entityId
+        }));
+        await db('officer_information').insert(officerData);
+        }
+    
+        // Fetch the inserted entity along with officer information
+        return await this.fetchById(entityId);
+    }
+
+// Update a record
+    async update() {
+        // Exclude the `created_at`,`updated_at` from the update data
+        const { created_at, updated_at, ...dataToUpdate } = this;
+        const fieldsToUpdate = Entity.getUpdateFields(dataToUpdate);
+        if (Object.keys(fieldsToUpdate).length > 0) {
+        return await db(DB_NAME)
+            .where({ entity_id: this.entity_id })
+            .update(fieldsToUpdate)
+            .returning(Object.keys(this));
+        }
+        return [this];
+    }
+
+  // Delete a record by ID
+  async delete(id) {
+    return await db(DB_NAME).where(id).del();
+  }
+
+  // Static method to prepare fields for updates
+  static getUpdateFields(instance) {
+    const updates = {};
+    for (const key in instance) {
+      if (
+        instance[key] !== undefined &&
+        key !== DB_PRIMARY_KEY &&
+        instance[key] !== null
+      ) {
+        updates[key] = instance[key] === "" ? "" : instance[key];
+      }
+    }
+    return updates;
+  }
+}
+
+export default Entity;
