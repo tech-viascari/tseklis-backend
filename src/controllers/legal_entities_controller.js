@@ -47,7 +47,7 @@ export const getLegalEntity = async (req, res) => {
   }
 };
 
-export const updatePermission = async (req, res) => {
+export const updateLegalEntity = async (req, res) => {
   // const { entity_id } = req.params;
 
   // console.log(entity_id);
@@ -56,7 +56,7 @@ export const updatePermission = async (req, res) => {
     // if (entity) {
     //   const newPermission = await new LegalEntities({ ...req.body }).update();
     //   if (newPermission) {
-    //     return res.status(200).json({ status: "success", newPermission });
+    return res.status(200).json({ status: "failed", newPermission: "" });
     //   } else {
     //     throw Error("Failed to update the record.");
     //   }
@@ -68,7 +68,7 @@ export const updatePermission = async (req, res) => {
   }
 };
 
-export const deletePermission = async (req, res) => {
+export const deleteLegalEntity = async (req, res) => {
   const { entity_id } = req.params;
 
   try {

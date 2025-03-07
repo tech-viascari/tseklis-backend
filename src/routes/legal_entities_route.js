@@ -2,9 +2,15 @@ import express from "express";
 import { checkPayloadMiddleware } from "../middlewares/global_middleware.js";
 import {
   addLegalEntity,
+  deleteLegalEntity,
   getAllLegalEntities,
+  getLegalEntity,
+  updateLegalEntity,
 } from "../controllers/legal_entities_controller.js";
-import { legalEntityMiddleware, uploadLogoMiddleware } from "../middlewares/legal_entities_middleware.js";
+import {
+  legalEntityMiddleware,
+  uploadLogoMiddleware,
+} from "../middlewares/legal_entities_middleware.js";
 
 const router = express.Router();
 router
@@ -19,8 +25,8 @@ router
 
 router
   .route("/legal-entities/:entity_id")
-  .get(checkPayloadMiddleware, getAllLegalEntities)
-  .patch(checkPayloadMiddleware, getAllLegalEntities)
-  .delete(checkPayloadMiddleware, getAllLegalEntities);
+  .get(checkPayloadMiddleware, getLegalEntity)
+  .patch(checkPayloadMiddleware, updateLegalEntity)
+  .delete(checkPayloadMiddleware, deleteLegalEntity);
 
 export default router;
