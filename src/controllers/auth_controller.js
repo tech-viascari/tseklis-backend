@@ -79,9 +79,9 @@ export const authenticate = async (req, res) => {
             httpOnly: true, // Makes the cookie inaccessible to JavaScript
             secure: process.env.ENVIRONMENT === "production", // Use HTTPS in production
             sameSite: "strict", // Prevents CSRF attacks
-            // maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
+            maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
             // maxAge: 30 * 1000, // Expires in 30 seconds
-            maxAge: 60 * 60 * 1000, // Expires in 1 hour
+            // maxAge: 60 * 60 * 1000, // Expires in 1 hour
             path: "/", // The cookie is available on the entire website
           });
 
@@ -150,9 +150,9 @@ export const googleAuth = async (req, res) => {
           httpOnly: true, // Makes the cookie inaccessible to JavaScript
           secure: process.env.ENVIRONMENT === "production", // Use HTTPS in production
           sameSite: "strict", // Prevents CSRF attacks
-          // maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
+          maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
           // maxAge: 30 * 1000, // Expires in 30 seconds
-          maxAge: 60 * 60 * 1000, // Expires in 1 hour
+          // maxAge: 60 * 60 * 1000, // Expires in 1 hour
           path: "/", // The cookie is available on the entire website
         });
         return res.status(200).json({ status: "success", user: returning });
