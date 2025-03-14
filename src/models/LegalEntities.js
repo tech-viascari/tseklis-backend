@@ -3,6 +3,16 @@ import db from "../database/db.js";
 const DB_NAME = "legal_entities";
 const DB_PRIMARY_KEY = "entity_id";
 
+const OfficerTypes = [
+  {label: "President", value: "President"},
+  {label: "Vice President", value: "Vice President"},
+  {label: "Corporate Secretary", value: "Corporate Secretary"},
+  {label: "Treasurer", value: "Treasurer"},
+  {label: "Compliance Officer", value: "Compliance Officer"},
+  {label: "Associated Person", value: "Associated Person"},
+  {label: "Not Applicable", value: "N/A"},
+ ];
+
 const OfficerInformationState = {
   officer_name: "",
   current_residence: "",
@@ -11,7 +21,7 @@ const OfficerInformationState = {
   board: "Member",
   gender: "Male",
   stockholder: "Yes",
-  officer: "Corporate Secretary",
+  officer: OfficerTypes,
   executive_committee: "N/A",
   tax_identification_number: "",
 };
