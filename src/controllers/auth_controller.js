@@ -50,7 +50,7 @@ export const authenticate = async (req, res) => {
         const access_token = encodeToken(
           "access_token",
           { user_id: user.user_id },
-          "1h"
+          "30d"
         );
         const updatedUser = new User({
           ...user,
@@ -120,7 +120,7 @@ export const googleAuth = async (req, res) => {
       const access_token = encodeToken(
         "access_token",
         { user_id: user.user_id },
-        "1h"
+        "30d"
       );
       const updatedUser = new User({
         ...user,
