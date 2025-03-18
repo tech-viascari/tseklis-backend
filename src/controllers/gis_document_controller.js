@@ -70,7 +70,10 @@ export const addGISDocument = async (req, res) => {
       ? moment(document_data.date_of_annual_meeting).format("MMDDYYYY")
       : moment(new Date()).format("MMDDYYYY");
 
-    const gisName = `${document_data.corporate_name} GIS ${document_data.year} ${type} ${dateOfMeeting}`;
+    const year =
+      document_data.year != "" ? document_data.year : new Date().getFullYear();
+
+    const gisName = `${document_data.corporate_name} GIS ${year} ${type} ${dateOfMeeting}`;
 
     const toInsert = {
       entity_id: entity_id,
