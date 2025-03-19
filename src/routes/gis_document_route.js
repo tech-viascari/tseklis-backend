@@ -30,9 +30,7 @@ router
   .patch(checkPayloadMiddleware, getAllGISDocuments)
   .delete(checkPayloadMiddleware, deleteGISDocument);
 
-router
-  .route("/generate-gis/:gis_document_id")
-  .get(generateGISDocument);
+router.route("/generate-gis/:gis_document_id").post(generateGISDocument);
 
 router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
 router.route("/update-gis-document/:gis_document_id").post(updateGIS);
