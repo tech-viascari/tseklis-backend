@@ -8,6 +8,8 @@ import {
   getAllEntityGISDocuments,
   getAllGISDocuments,
   getGISDocument,
+  updateGIS,
+  updateGISDocument,
 } from "../controllers/gis_document_controller.js";
 const router = express.Router();
 
@@ -31,6 +33,10 @@ router
 router
   .route("/generate-quote/:gis_document_id")
   .get(checkPayloadMiddleware, generateGISDocument);
+
 router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
+
+router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
+router.route("/update-gis-document/:gis_document_id").post(updateGIS);
 
 export default router;
