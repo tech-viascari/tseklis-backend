@@ -66,8 +66,8 @@ export const addGISDocument = async (req, res) => {
 
     const type = document_data.is_special_meeting ? "AMENDMENT" : "ANNUAL";
 
-    const dateOfMeeting = document_data.date_of_annual_meeting
-      ? moment(document_data.date_of_annual_meeting).format("MMDDYYYY")
+    const dateOfMeeting = document_data.actual_date_of_annual_meeting
+      ? moment(document_data.actual_date_of_annual_meeting).format("MMDDYYYY")
       : moment(new Date()).format("MMDDYYYY");
 
     const year =
