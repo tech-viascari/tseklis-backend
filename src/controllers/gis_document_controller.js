@@ -205,7 +205,7 @@ export const getLatestGIS = async (req, res) => {
 };
 
 export const updateGIS = async (req, res) => {
-  const { gis_document_id } = req.params.recordId;
+  const { gis_document_id } = req.params;
   const { google_sheets } = req.body;
 
   let attachments = {
@@ -213,7 +213,7 @@ export const updateGIS = async (req, res) => {
   };
 
   try {
-    const update = await db("records")
+    const update = await db("gis_documents")
       .where("gis_document_id", gis_document_id)
       .update({ attachments });
 
