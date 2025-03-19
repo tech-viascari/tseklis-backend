@@ -148,7 +148,7 @@ export const deleteGISDocument = async (req, res) => {
 export const generateGISDocument = async (req, res) => {
   const { gis_document_id } = req.params;
 
-  //Update Existing GIS
+  // //Update Existing GIS
   // if (record.attachments.google_sheets != "") {
   //   let toUpdate = {
   //     draftingInput: JSON.stringify(record.draftingInput),
@@ -161,7 +161,7 @@ export const generateGISDocument = async (req, res) => {
   // }
 
   let url =
-    "https://script.google.com/a/macros/fullsuite.ph/s/AKfycbwqWncGPkcHl8kFalRxK2syj8zH-MSKB5RrFCiIdwW1R67qqtbmU9l5MGfAV5sc8Y27ZQ/exec";
+    "https://script.google.com/macros/s/AKfycbw50fPWqm4GxscgF65t-n-D2v1P2n6ofGPRLqgq9obUZ9IejRbImXqh33D5vzjceOoS/exec";
 
   try {
     let response = await axios.get(url, {
