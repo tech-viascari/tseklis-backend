@@ -32,9 +32,7 @@ router
 
 router
   .route("/generate-gis/:gis_document_id")
-  .get(checkPayloadMiddleware, generateGISDocument);
-
-router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
+  .get(generateGISDocument);
 
 router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
 router.route("/update-gis-document/:gis_document_id").post(updateGIS);
