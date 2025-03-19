@@ -31,7 +31,7 @@ router
   .delete(checkPayloadMiddleware, deleteGISDocument);
 
 router
-  .route("/generate-quote/:gis_document_id")
+  .route("/generate-gis/:gis_document_id")
   .get(checkPayloadMiddleware, generateGISDocument);
 
 router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
