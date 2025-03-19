@@ -96,24 +96,24 @@ export const addGISDocument = async (req, res) => {
 };
 
 export const updateGISDocument = async (req, res) => {
-  const { entity_id } = req.params;
+  const { gis_document_id } = req.params;
   try {
-    // const quote = await new Quote().fetch({ quote_id });
+    const gis_document = await new GISDocument().fetch({ gis_document_id });
 
-    // if (quote) {
-    //   const timestamp = new Quote().getQuoteStatus({
-    //     ...req.body.timestamp,
-    //     user_id: req.current_user.user_id,
-    //   });
-    //   const updated = await new Quote({ ...quote, ...req.body.quote }).update(
-    //     timestamp
-    //   );
-    return res
-      .status(200)
-      .json({ success: true, message: "For testing, not yet completed" });
-    // } else {
-    //   throw Error("Quote ID is not found.");
-    // }
+    if (gis_document) {
+      // const timestamp = new Quote().getQuoteStatus({
+      //   ...req.body.timestamp,
+      //   user_id: req.current_user.user_id,
+      // });
+      // const updated = await new Quote({ ...quote, ...req.body.quote }).update(
+      //   timestamp
+      // );
+      return res
+        .status(200)
+        .json({ success: true, message: "For testing, not yet completed" });
+    } else {
+      throw Error("Document ID is not found.");
+    }
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -201,5 +201,28 @@ export const getLatestGIS = async (req, res) => {
   } catch (e) {
     //returns 500 status code
     res.status(500).json({ error: "Internal Server Error", err: e });
+  }
+};
+
+export const updateGIS = async (req, res) => {
+  const { gis_document_id } = req.params.recordId;
+  const { google_sheets } = req.body;
+
+  let attachments = {
+    google_sheets: google_sheets,
+  };
+
+  try {
+    const update = await db("records")
+      .where("gis_document_id", gis_document_id)
+      .update({ attachments });
+
+    if (update) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
+    }
+  } catch (error) {
+    res.sendStatus(500);
   }
 };
