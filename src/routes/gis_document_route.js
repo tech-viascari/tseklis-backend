@@ -4,6 +4,7 @@ import { checkPayloadMiddleware } from "../middlewares/global_middleware.js";
 import {
   addGISDocument,
   deleteGISDocument,
+  generateGISDocument,
   getAllEntityGISDocuments,
   getAllGISDocuments,
   getGISDocument,
@@ -19,19 +20,17 @@ router
 router
   .route(`${PATH}`)
   .get(checkPayloadMiddleware, getAllEntityGISDocuments)
-  // TODO: Add GIS
   .post(checkPayloadMiddleware, addGISDocument);
 
 router
   .route(`${PATH}/:gis_document_id`)
-  // TODO: Get GIS
   .get(checkPayloadMiddleware, getGISDocument)
-  // TODO: Update GIS
   .patch(checkPayloadMiddleware, getAllGISDocuments)
-  // TODO: Delete GIS
   .delete(checkPayloadMiddleware, deleteGISDocument);
 
-// router.route("/generate-quote").get(checkPayloadMiddleware, generateQuote);
-// router.route("/get-quote/:quote_id").get(getQuote);
+router
+  .route("/generate-quote/:gis_document_id")
+  .get(checkPayloadMiddleware, generateGISDocument);
+router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
 
 export default router;
