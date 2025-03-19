@@ -161,7 +161,7 @@ export const generateGISDocument = async (req, res) => {
   // }
 
   let url =
-    "https://script.google.com/macros/s/AKfycbzEvCfXBwAeu_q0cbcGuS5Zq8fICHZMFFv-j1vGnuOxBY95k_shp7VqyW5VLcOsiBI/exec";
+    "https://script.google.com/a/macros/viascari.com/s/AKfycbzSEl3TK5jfwFjrSadtChxut4O79IVUsTtXfXWZqpFFVxhgZ_1je0-AA6CVqkBdEqDH/exec";
 
   try {
     let response = await axios.get(url, {
