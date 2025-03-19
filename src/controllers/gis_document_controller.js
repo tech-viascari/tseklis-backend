@@ -32,10 +32,10 @@ export const getAllEntityGISDocuments = async (req, res) => {
 };
 
 export const getGISDocument = async (req, res) => {
-  const { entity_id } = req.params;
+  const { gis_document_id } = req.params;
 
   try {
-    let gis_document = await new GISDocument().fetch({ entity_id });
+    let gis_document = await new GISDocument().fetch({ gis_document_id });
 
     if (gis_document) {
       res.status(200).json({ gis_document });
@@ -146,7 +146,7 @@ export const deleteGISDocument = async (req, res) => {
 };
 
 export const generateGISDocument = async (req, res) => {
-  const gis_document_id = req.params.gis_document_id;
+  const { gis_document_id } = req.params;
 
   //Update Existing GIS
   // if (record.attachments.google_sheets != "") {
