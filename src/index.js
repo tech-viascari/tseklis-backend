@@ -20,6 +20,7 @@ app.use(
       process.env.LOCALHOST_CLIENT_URL,
       process.env.STAGING_CLIENT_URL,
       process.env.PRODUCTION_CLIENT_URL,
+      process.env.APP_SCRIPT_URL,
     ],
     credentials: true,
   })
