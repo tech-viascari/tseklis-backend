@@ -96,21 +96,32 @@ export const addGISDocument = async (req, res) => {
 };
 
 export const updateGISDocument = async (req, res) => {
-  const { gis_document_id } = req.params;
+  const { gis_document_id, entity_id } = req.params;
+  const { document_data, attachments, timestamp } = req.body;
+
   try {
     const gis_document = await new GISDocument().fetch({ gis_document_id });
 
     if (gis_document) {
-      // const timestamp = new Quote().getQuoteStatus({
-      //   ...req.body.timestamp,
-      //   user_id: req.current_user.user_id,
-      // });
-      // const updated = await new Quote({ ...quote, ...req.body.quote }).update(
-      //   timestamp
-      // );
-      return res
-        .status(200)
-        .json({ success: true, message: "For testing, not yet completed" });
+      const newTimestamp = new GISDocument().getGISTimestamp({
+        status: timestamp.status,
+        remarks: timestamp.remarks,
+        user_id: req.current_user.user_id,
+      });
+
+      const updated = await new GISDocument({
+        ...gis_document,
+        document_data,
+      }).update(newTimestamp);
+
+      if (updated) {
+        return res.status(200).json({
+          success: true,
+          updated,
+        });
+      } else {
+        throw Error("There's a problem processing the update.");
+      }
     } else {
       throw Error("Document ID is not found.");
     }
