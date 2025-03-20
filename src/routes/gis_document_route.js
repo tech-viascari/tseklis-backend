@@ -27,7 +27,7 @@ router
 router
   .route(`${PATH}/:gis_document_id`)
   .get(checkPayloadMiddleware, getGISDocument)
-  .patch(checkPayloadMiddleware, getAllGISDocuments)
+  .patch(checkPayloadMiddleware, updateGISDocument)
   .delete(checkPayloadMiddleware, deleteGISDocument);
 
 router.route("/generate-gis/:gis_document_id").post(generateGISDocument);
