@@ -11,7 +11,6 @@ import roles_route from "./routes/roles_route.js";
 import legal_entities_route from "./routes/legal_entities_route.js";
 import project_management_route from "./routes/project_management_route.js";
 import gis_document_route from "./routes/gis_document_route.js";
-import document_drafting_route from "./routes/document_drafting_route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,7 +38,6 @@ app.use(roles_route);
 app.use(legal_entities_route);
 app.use(project_management_route);
 app.use(gis_document_route);
-app.use(document_drafting_route);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
