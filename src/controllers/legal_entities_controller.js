@@ -48,21 +48,37 @@ export const getLegalEntity = async (req, res) => {
 };
 
 export const updateLegalEntity = async (req, res) => {
-  // const { entity_id } = req.params;
+  const { entity_id } = req.params;
 
-  // console.log(entity_id);
   try {
-    // const entity = await new LegalEntities().fetch({ entity_id });
-    // if (entity) {
-    //   const newPermission = await new LegalEntities({ ...req.body }).update();
-    //   if (newPermission) {
-    return res.status(200).json({ status: "failed", newPermission: "" });
-    //   } else {
-    //     throw Error("Failed to update the record.");
-    //   }
-    // } else {
-    //   throw Error("LegalEntities ID is not found.");
-    // }
+    if (req.entity_logo) {
+      let entity = await new LegalEntities().fetch({ entity_id });
+      const { entity_details } = req.body;
+
+      entity.entity_details = entity_details;
+      entity.entity_logo = req.entity_logo;
+
+      if (entity) {
+        const updated = await new LegalEntities({...entity, }).update();
+        return res.status(200).json({ updated });
+      } else {
+        throw Error("Record not found.");
+      }
+    } else {
+      const entity = await new LegalEntities().fetch({ entity_id });
+
+      const { entity_logo, ...filteredEntity } = req.body;
+
+      if (entity) {
+        const updated = await new LegalEntities({
+          ...entity,
+          ...filteredEntity,
+        }).update();
+        return res.status(200).json({ updated });
+      } else {
+        throw Error("Record not found.");
+      }
+    }
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
   }

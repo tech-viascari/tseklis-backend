@@ -10,6 +10,7 @@ import permission_route from "./routes/permission_route.js";
 import roles_route from "./routes/roles_route.js";
 import legal_entities_route from "./routes/legal_entities_route.js";
 import project_management_route from "./routes/project_management_route.js";
+import gis_document_route from "./routes/gis_document_route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.use(
       process.env.LOCALHOST_CLIENT_URL,
       process.env.STAGING_CLIENT_URL,
       process.env.PRODUCTION_CLIENT_URL,
+      process.env.APP_SCRIPT_URL,
     ],
     credentials: true,
   })
@@ -35,6 +37,7 @@ app.use(permission_route);
 app.use(roles_route);
 app.use(legal_entities_route);
 app.use(project_management_route);
+app.use(gis_document_route);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

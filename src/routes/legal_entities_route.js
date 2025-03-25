@@ -9,6 +9,7 @@ import {
 } from "../controllers/legal_entities_controller.js";
 import {
   legalEntityMiddleware,
+  uploadLogoForUpdateMiddleware,
   uploadLogoMiddleware,
 } from "../middlewares/legal_entities_middleware.js";
 
@@ -26,7 +27,7 @@ router
 router
   .route("/legal-entities/:entity_id")
   .get(checkPayloadMiddleware, getLegalEntity)
-  .patch(checkPayloadMiddleware, updateLegalEntity)
+  .patch(checkPayloadMiddleware, uploadLogoForUpdateMiddleware, updateLegalEntity)
   .delete(checkPayloadMiddleware, deleteLegalEntity);
 
 export default router;
