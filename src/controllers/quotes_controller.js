@@ -1,3 +1,4 @@
+import moment from "moment";
 import db from "../database/db.js";
 import Quote from "../models/Quote.js";
 import axios from "axios";
@@ -46,16 +47,13 @@ export const addQuote = async (req, res) => {
       return res.status(400).json("Please select a valid company.");
     }
 
-    // let quote_name = `${data.service_type} ${moment().format(
-    //   "MMDDYYYYhhmmssA"
-    // )}`;
-
     let quote_name = `${data.subject}`;
 
     const timestamp = new Quote().getQuoteStatus({
       status: req.body.timestamp.status,
       remarks: req.body.timestamp.remarks,
       user_id: req.current_user.user_id,
+      datetime: moment().format(),
     });
 
     const { status, ...filteredData } = data;
@@ -87,6 +85,7 @@ export const updateQuote = async (req, res) => {
       const timestamp = new Quote().getQuoteStatus({
         ...req.body.timestamp,
         user_id: req.current_user.user_id,
+        datetime: moment().format(),
       });
       const updated = await new Quote({ ...quote, ...req.body.quote }).update(
         timestamp
