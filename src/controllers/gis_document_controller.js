@@ -62,6 +62,7 @@ export const addGISDocument = async (req, res) => {
       status: timestamp.status,
       remarks: timestamp.remarks,
       user_id: req.current_user.user_id,
+      datetime: moment().format(),
     });
 
     const type = document_data.is_special_meeting ? "AMENDMENT" : "ANNUAL";
@@ -107,6 +108,7 @@ export const updateGISDocument = async (req, res) => {
         status: timestamp.status,
         remarks: timestamp.remarks,
         user_id: req.current_user.user_id,
+        datetime: moment().format(),
       });
 
       const updated = await new GISDocument({
