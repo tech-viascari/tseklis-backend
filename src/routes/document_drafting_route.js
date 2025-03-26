@@ -8,6 +8,7 @@ import {
   getAllDraftedDocuments,
   getAllEntityDocuments,
   getDocument,
+  updateDocument,
 } from "../controllers/document_drafting_controller.js";
 
 const router = express.Router();
@@ -26,7 +27,7 @@ router
 router
   .route(`${PATH}/:document_id`)
   .get(checkPayloadMiddleware, getDocument)
-  // .patch(checkPayloadMiddleware, updateGISDocument)
+  .patch(checkPayloadMiddleware, updateDocument)
   .delete(checkPayloadMiddleware, deleteDocument);
 
 router.route("/generate-document/:document_id").post(generateDocument);

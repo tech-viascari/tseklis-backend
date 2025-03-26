@@ -9,7 +9,7 @@ export const checkPayloadMiddleware = async (req, res, next) => {
 
   const user =
     payload == "postman" && process.env.ENVIRONMENT == "development"
-      ? { email: "michael@viascari.com" }
+      ? { email: "tech@viascari.com" }
       : {
           user_id: payload.access_token.user_id,
         };

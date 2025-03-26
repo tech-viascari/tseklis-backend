@@ -61,6 +61,7 @@ export const addDocument = async (req, res) => {
       status: timestamp.status,
       remarks: timestamp.remarks,
       user_id: req.current_user.user_id,
+      datetime: moment().format(),
     });
 
     const date = moment(new Date()).format("MMDDYYYY");
@@ -86,18 +87,19 @@ export const addDocument = async (req, res) => {
   }
 };
 
-export const updateGISDocument = async (req, res) => {
+export const updateDocument = async (req, res) => {
   const { document_id, entity_id } = req.params;
-  const { document_data, attachments, timestamp } = req.body;
+  const { document_data, timestamp } = req.body;
 
   try {
     const document = await new Document().fetch({ document_id });
 
     if (document) {
-      const newTimestamp = new Document().getGISTimestamp({
+      const newTimestamp = new Document().getDocumentTimestamp({
         status: timestamp.status,
         remarks: timestamp.remarks,
         user_id: req.current_user.user_id,
+        datetime: moment().format(),
       });
 
       const updated = await new Document({
@@ -180,25 +182,25 @@ export const generateDocument = async (req, res) => {
   }
 };
 
-export const updateDocument = async (req, res) => {
-  const { document_id } = req.params;
-  const { google_sheets } = req.body;
+// export const updateDocument = async (req, res) => {
+//   const { document_id } = req.params;
+//   const { google_sheets } = req.body;
 
-  let attachments = {
-    google_sheets: google_sheets,
-  };
+//   let attachments = {
+//     google_sheets: google_sheets,
+//   };
 
-  try {
-    const update = await db("gis_documents")
-      .where("document_id", document_id)
-      .update({ attachments });
+//   try {
+//     const update = await db("gis_documents")
+//       .where("document_id", document_id)
+//       .update({ attachments });
 
-    if (update) {
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(500);
-    }
-  } catch (error) {
-    res.sendStatus(500);
-  }
-};
+//     if (update) {
+//       res.sendStatus(200);
+//     } else {
+//       res.sendStatus(500);
+//     }
+//   } catch (error) {
+//     res.sendStatus(500);
+//   }
+// };
