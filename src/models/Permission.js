@@ -17,6 +17,51 @@ class Permission {
     this.updated_at = updated_at;
   }
 
+  async fetchPermissionPaginate(limit = 10, page = 1, searchQuery = "") {
+    const parsedLimit = parseInt(limit); // Ensure limit is a number
+    const parsedPage = parseInt(page); // Ensure page is a number
+
+    const offset = (parsedPage - 1) * parsedLimit; // Calculate offset based on page number
+
+    // Build the query
+    let query = db("permissions")
+      .select("*")
+      .limit(parsedLimit)
+      .offset(offset)
+      .orderBy("created_at", "asc");
+
+    // If there's a search query, filter the results
+    if (searchQuery) {
+      query = query.where("permission_name", "like", `%${searchQuery}%`); // Adjust the column as needed (e.g., `permission_name`)
+    }
+
+    // Fetch the filtered data
+    let data = await query;
+
+    // Get the total count considering the search filter
+    let countQuery = db("permissions").count("* as count");
+    if (searchQuery) {
+      countQuery = countQuery.where(
+        "permission_name",
+        "like",
+        `%${searchQuery}%`
+      ); // Filter for total count as well
+    }
+
+    const totalCount = (await countQuery)[0].count;
+    const totalPages = Math.ceil(totalCount / parsedLimit);
+
+    let pagination = {
+      page: parsedPage,
+      per_page: parsedLimit,
+      total: totalCount,
+      total_pages: totalPages,
+      data,
+    };
+
+    return pagination;
+  }
+
   // Fetch all records
   async fetchAll() {
     return await db(DB_NAME).select("*");

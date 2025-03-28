@@ -1,5 +1,20 @@
-import db from "../database/db.js";
 import Permission from "../models/Permission.js";
+
+export const getPaginate = async (req, res) => {
+  const { limit = 10, page = 1, search = "" } = req.query;
+
+  try {
+    const pagination = await new Permission().fetchPermissionPaginate(
+      limit,
+      page,
+      search
+    );
+    return res.status(200).json(pagination);
+  } catch (e) {
+    console.error("Error fetching companies:", e);
+    return res.status(500).json({ error: "Failed to fetch companies" });
+  }
+};
 
 export const getAllPermissions = async (req, res) => {
   const permissions = await new Permission().fetchAll();
