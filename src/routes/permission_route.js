@@ -4,6 +4,7 @@ import {
   addPermission,
   deletePermission,
   getAllPermissions,
+  getPaginate,
   getPermission,
   updatePermission,
 } from "../controllers/permissions_controller.js";
@@ -19,5 +20,7 @@ router
   .get(checkPayloadMiddleware, getPermission)
   .patch(checkPayloadMiddleware, updatePermission)
   .delete(checkPayloadMiddleware, deletePermission);
+
+router.get("/permissions/getPaginate", getPaginate);
 
 export default router;
