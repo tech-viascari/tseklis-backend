@@ -42,53 +42,10 @@ export const authenticate = async (req, res) => {
 
   try {
     const user = await new User().fetch({ email });
-
     if (user) {
       const hash = bcrypt.compareSync(password, user.password);
       if (hash) {
-        // Sign the JWT with the payload and the secret key
-        const access_token = encodeToken(
-          "access_token",
-          { user_id: user.user_id },
-          "30d"
-        );
-        const updatedUser = new User({
-          ...user,
-          last_login: new Date(),
-          access_token,
-          refresh_token: access_token,
-        });
-
-        let response = await updatedUser.update([]);
-
-        if (response) {
-          const returning = {
-            email: response[0].email,
-            first_name: response[0].first_name,
-            last_login: response[0].last_login,
-            last_name: response[0].last_name,
-            middle_name: response[0].middle_name,
-            slack_id: response[0].slack_id,
-            status: response[0].status,
-            user_id: response[0].user_id,
-            picture: response[0].picture,
-          };
-
-          // Send the token in an HTTP-only cookie
-          res.cookie("access_token", access_token, {
-            httpOnly: true, // Makes the cookie inaccessible to JavaScript
-            secure: process.env.ENVIRONMENT === "production", // Use HTTPS in production
-            sameSite: "strict", // Prevents CSRF attacks
-            maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
-            // maxAge: 30 * 1000, // Expires in 30 seconds
-            // maxAge: 60 * 60 * 1000, // Expires in 1 hour
-            path: "/", // The cookie is available on the entire website
-          });
-
-          return res.status(200).json({ status: "success", user: returning });
-        } else {
-          throw Error("Failed to update user!");
-        }
+        await authenticateUser(res, { email }, "");
       } else {
         throw Error("Incorrect Email or Password!");
       }
@@ -110,60 +67,61 @@ export const googleAuth = async (req, res) => {
         headers: { Authorization: `Bearer ${tokens.access_token}` },
       }
     );
-
     const googleUser = userInfo.data;
-
-    const user = await new User().fetch({ email: googleUser.email });
-
-    if (user) {
-      // Sign the JWT with the payload and the secret key
-      const access_token = encodeToken(
-        "access_token",
-        { user_id: user.user_id },
-        "30d"
-      );
-      const updatedUser = new User({
-        ...user,
-        picture: googleUser.picture,
-        last_login: new Date(),
-        access_token,
-        refresh_token: access_token,
-      });
-
-      let response = await updatedUser.update([]);
-
-      if (response) {
-        const returning = {
-          email: response[0].email,
-          first_name: response[0].first_name,
-          last_login: response[0].last_login,
-          last_name: response[0].last_name,
-          middle_name: response[0].middle_name,
-          slack_id: response[0].slack_id,
-          status: response[0].status,
-          user_id: response[0].user_id,
-          picture: response[0].picture,
-        };
-
-        // Send the token in an HTTP-only cookie
-        res.cookie("access_token", access_token, {
-          httpOnly: true, // Makes the cookie inaccessible to JavaScript
-          secure: process.env.ENVIRONMENT === "production", // Use HTTPS in production
-          sameSite: "strict", // Prevents CSRF attacks
-          maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
-          // maxAge: 30 * 1000, // Expires in 30 seconds
-          // maxAge: 60 * 60 * 1000, // Expires in 1 hour
-          path: "/", // The cookie is available on the entire website
-        });
-        return res.status(200).json({ status: "success", user: returning });
-      } else {
-        throw Error("There was an error processing the data.");
-      }
-    } else {
-      throw Error("The user could not be found.");
-    }
+    await authenticateUser(
+      res,
+      { email: googleUser.email },
+      googleUser.picture
+    );
   } catch (error) {
     return res.status(500).json({ status: "failed", message: error.message });
+  }
+};
+
+export const authenticateUser = async (res, column, picture = "") => {
+  const user = await new User().fetch(column);
+  if (user) {
+    // Sign the JWT with the payload and the secret key
+    const access_token = encodeToken(
+      "access_token",
+      { user_id: user.user_id },
+      "30d"
+    );
+
+    let payload = {
+      ...user,
+      last_login: new Date(),
+      access_token,
+      refresh_token: access_token,
+    };
+
+    if (picture !== "") {
+      payload.picture = picture;
+    }
+
+    const updatedUser = new User(payload);
+
+    let response = await updatedUser.update([]);
+
+    if (response) {
+      const { password, refresh_token, ...filteredUser } = user;
+
+      // Send the token in an HTTP-only cookie
+      res.cookie("access_token", access_token, {
+        httpOnly: true, // Makes the cookie inaccessible to JavaScript
+        secure: process.env.ENVIRONMENT === "production", // Use HTTPS in production
+        sameSite: "strict", // Prevents CSRF attacks
+        maxAge: 30 * 24 * 60 * 60 * 1000, // Expires in 30 days
+        // maxAge: 30 * 1000, // Expires in 30 seconds
+        // maxAge: 60 * 60 * 1000, // Expires in 1 hour
+        path: "/", // The cookie is available on the entire website
+      });
+      return res.status(200).json({ status: "success", user: filteredUser });
+    } else {
+      return Error("There was an error processing the data.");
+    }
+  } else {
+    return Error("The user could not be found.");
   }
 };
 
