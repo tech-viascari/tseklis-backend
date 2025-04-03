@@ -98,7 +98,7 @@ export const addGISDocument = async (req, res) => {
 
 export const updateGISDocument = async (req, res) => {
   const { gis_document_id, entity_id } = req.params;
-  const { document_data, attachments, timestamp } = req.body;
+  let { document_data, attachments, timestamp, date_received = "" } = req.body;
 
   try {
     const gis_document = await new GISDocument().fetch({ gis_document_id });
@@ -111,9 +111,14 @@ export const updateGISDocument = async (req, res) => {
         datetime: moment().format(),
       });
 
+      if (date_received == "") {
+        date_received = null;
+      }
+
       const updated = await new GISDocument({
         ...gis_document,
         document_data,
+        date_received,
       }).update(newTimestamp);
 
       if (updated) {
