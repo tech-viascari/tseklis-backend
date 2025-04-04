@@ -3,13 +3,7 @@ import ProjectManagement from "../models/ProjectManagement.js";
 export const getAllProjects = async (req, res) => {
   try {
     const projects = await new ProjectManagement().fetchAll();
-
-    // Parse JSON fields for all projects
-    const parsedProjects = projects.map((project) =>
-      new ProjectManagement().parseJsonFields(project)
-    );
-
-    return res.status(200).json(parsedProjects);
+    return res.status(200).json(projects);
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
   }
@@ -33,12 +27,11 @@ export const getProject = async (req, res) => {
   const { project_id } = req.params;
 
   try {
-    const projectModel = new ProjectManagement();
+    const projectModel = new ProjectManagement({ project_id });
     const project = await projectModel.fetch({ project_id });
 
     if (project) {
-      const parsedProject = projectModel.parseJsonFields(project);
-      return res.status(200).json({ project: parsedProject });
+      return res.status(200).json({ project });
     } else {
       return res
         .status(404)
@@ -53,31 +46,15 @@ export const updateProject = async (req, res) => {
   const { project_id } = req.params;
 
   try {
-    const projectModel = new ProjectManagement();
-    const existingProject = await projectModel.fetch({ project_id });
+    const projectModel = new ProjectManagement({ project_id });
+    const updatedProject = await projectModel.update(req.body);
 
-    if (existingProject) {
-      const parsedExisting = projectModel.parseJsonFields(existingProject);
-
-      const projectToUpdate = new ProjectManagement({
-        ...parsedExisting,
-        ...req.body,
-        project_id,
-      });
-
-      const updatedProject = await projectToUpdate.update();
-
-      if (updatedProject) {
-        return res
-          .status(200)
-          .json({ status: "success", project: updatedProject });
-      } else {
-        throw Error("Failed to update the project record.");
-      }
-    } else {
+    if (updatedProject) {
       return res
-        .status(404)
-        .json({ status: "failed", error: "Project ID is not found." });
+        .status(200)
+        .json({ status: "success", project: updatedProject });
+    } else {
+      throw Error("Failed to update the project record.");
     }
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
@@ -88,51 +65,42 @@ export const deleteProject = async (req, res) => {
   const { project_id } = req.params;
 
   try {
-    const projectExists = await new ProjectManagement().fetch({ project_id });
-
-    if (!projectExists) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
-
     const projectToDelete = new ProjectManagement({ project_id });
-    const result = await projectToDelete.delete();
+    await projectToDelete.delete();
 
-    if (result) {
-      return res
-        .status(200)
-        .json({ status: "success", message: "Project deleted successfully" });
-    } else {
-      throw Error("Failed to delete the project record.");
-    }
+    return res
+      .status(200)
+      .json({ status: "success", message: "Project deleted successfully" });
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
   }
 };
 
-// Helper methods for array fields
+// Notes-related controllers
+export const getProjectNotes = async (req, res) => {
+  const { project_id } = req.params;
+
+  try {
+    const projectModel = new ProjectManagement({ project_id });
+    const notes = await projectModel.fetchNotes(project_id);
+
+    return res.status(200).json({ notes });
+  } catch (error) {
+    return res.status(500).json({ status: "failed", error: error.message });
+  }
+};
 
 export const addProjectNote = async (req, res) => {
   const { project_id } = req.params;
 
   try {
     const projectModel = new ProjectManagement({ project_id });
-    const project = await projectModel.fetch({ project_id });
+    const note = await projectModel.addNote(req.body);
 
-    if (!project) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
-
-    const updatedProject = await projectModel.addNote(req.body);
-
-    if (updatedProject) {
+    if (note) {
       return res.status(201).json({
         status: "success",
-        note: req.body,
-        project: updatedProject,
+        note,
       });
     } else {
       throw Error("Failed to add note to the project.");
@@ -142,59 +110,15 @@ export const addProjectNote = async (req, res) => {
   }
 };
 
-export const addProjectPrereq = async (req, res) => {
+// Updates/Logs-related controllers
+export const getProjectUpdates = async (req, res) => {
   const { project_id } = req.params;
 
   try {
     const projectModel = new ProjectManagement({ project_id });
-    const project = await projectModel.fetch({ project_id });
+    const updates = await projectModel.fetchLogs(project_id);
 
-    if (!project) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
-
-    const updatedProject = await projectModel.addPrereq(req.body);
-
-    if (updatedProject) {
-      return res.status(201).json({
-        status: "success",
-        prereq: req.body,
-        project: updatedProject,
-      });
-    } else {
-      throw Error("Failed to add prerequisite to the project.");
-    }
-  } catch (error) {
-    return res.status(500).json({ status: "failed", error: error.message });
-  }
-};
-
-export const addProjectTask = async (req, res) => {
-  const { project_id } = req.params;
-
-  try {
-    const projectModel = new ProjectManagement({ project_id });
-    const project = await projectModel.fetch({ project_id });
-
-    if (!project) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
-
-    const updatedProject = await projectModel.addTask(req.body);
-
-    if (updatedProject) {
-      return res.status(201).json({
-        status: "success",
-        task: req.body,
-        project: updatedProject,
-      });
-    } else {
-      throw Error("Failed to add task to the project.");
-    }
+    return res.status(200).json({ updates });
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
   }
@@ -205,21 +129,12 @@ export const addProjectUpdate = async (req, res) => {
 
   try {
     const projectModel = new ProjectManagement({ project_id });
-    const project = await projectModel.fetch({ project_id });
+    const update = await projectModel.addUpdate(req.body);
 
-    if (!project) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
-
-    const updatedProject = await projectModel.addUpdate(req.body);
-
-    if (updatedProject) {
+    if (update) {
       return res.status(201).json({
         status: "success",
-        update: req.body,
-        project: updatedProject,
+        update,
       });
     } else {
       throw Error("Failed to add update to the project.");
@@ -229,36 +144,34 @@ export const addProjectUpdate = async (req, res) => {
   }
 };
 
-export const updateProjectTask = async (req, res) => {
-  const { project_id, task_id } = req.params;
+// Prerequisites-related controllers
+export const getProjectPrereqs = async (req, res) => {
+  const { project_id } = req.params;
 
   try {
     const projectModel = new ProjectManagement({ project_id });
-    const project = await projectModel.fetch({ project_id });
+    const prerequisites = await projectModel.fetchPrerequisites(project_id);
 
-    if (!project) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
+    return res.status(200).json({ prerequisites });
+  } catch (error) {
+    return res.status(500).json({ status: "failed", error: error.message });
+  }
+};
 
-    const updatedProject = await projectModel.updateTask(task_id, req.body);
+export const addProjectPrereq = async (req, res) => {
+  const { project_id } = req.params;
 
-    if (updatedProject) {
-      // Find the updated task in the project
-      const updatedTask = updatedProject.project_tasks.find(
-        (task) => task.id === parseInt(task_id)
-      );
+  try {
+    const projectModel = new ProjectManagement({ project_id });
+    const prereq = await projectModel.addPrereq(req.body);
 
-      return res.status(200).json({
+    if (prereq) {
+      return res.status(201).json({
         status: "success",
-        task: updatedTask,
-        project: updatedProject,
+        prereq,
       });
     } else {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Task not found." });
+      throw Error("Failed to add prerequisite to the project.");
     }
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
@@ -270,31 +183,73 @@ export const updateProjectPrereq = async (req, res) => {
 
   try {
     const projectModel = new ProjectManagement({ project_id });
-    const project = await projectModel.fetch({ project_id });
+    const updatedPrereq = await projectModel.updatePrereq(prereq_id, req.body);
 
-    if (!project) {
-      return res
-        .status(404)
-        .json({ status: "failed", error: "Project not found." });
-    }
-
-    const updatedProject = await projectModel.updatePrereq(prereq_id, req.body);
-
-    if (updatedProject) {
-      // Find the updated prerequisite in the project
-      const updatedPrereq = updatedProject.project_prereq.find(
-        (prereq) => prereq.id === parseInt(prereq_id)
-      );
-
+    if (updatedPrereq) {
       return res.status(200).json({
         status: "success",
         prereq: updatedPrereq,
-        project: updatedProject,
       });
     } else {
       return res
         .status(404)
         .json({ status: "failed", error: "Prerequisite not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: "failed", error: error.message });
+  }
+};
+
+// Tasks-related controllers
+export const getProjectTasks = async (req, res) => {
+  const { project_id } = req.params;
+
+  try {
+    const projectModel = new ProjectManagement({ project_id });
+    const tasks = await projectModel.fetchTasks(project_id);
+
+    return res.status(200).json({ tasks });
+  } catch (error) {
+    return res.status(500).json({ status: "failed", error: error.message });
+  }
+};
+
+export const addProjectTask = async (req, res) => {
+  const { project_id } = req.params;
+
+  try {
+    const projectModel = new ProjectManagement({ project_id });
+    const task = await projectModel.addTask(req.body);
+
+    if (task) {
+      return res.status(201).json({
+        status: "success",
+        task,
+      });
+    } else {
+      throw Error("Failed to add task to the project.");
+    }
+  } catch (error) {
+    return res.status(500).json({ status: "failed", error: error.message });
+  }
+};
+
+export const updateProjectTask = async (req, res) => {
+  const { project_id, task_id } = req.params;
+
+  try {
+    const projectModel = new ProjectManagement({ project_id });
+    const updatedTask = await projectModel.updateTask(task_id, req.body);
+
+    if (updatedTask) {
+      return res.status(200).json({
+        status: "success",
+        task: updatedTask,
+      });
+    } else {
+      return res
+        .status(404)
+        .json({ status: "failed", error: "Task not found." });
     }
   } catch (error) {
     return res.status(500).json({ status: "failed", error: error.message });
