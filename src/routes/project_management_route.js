@@ -1,17 +1,30 @@
 import express from "express";
 import { checkPayloadMiddleware } from "../middlewares/global_middleware.js";
 import {
+  // Main project CRUD operations
   getAllProjects,
   addProject,
   getProject,
   updateProject,
   deleteProject,
+
+  // Notes-related routes
   addProjectNote,
+  getProjectNotes,
+
+  // Updates/Logs-related routes
   addProjectUpdate,
+  getProjectUpdates,
+
+  // Prerequisites-related routes
   addProjectPrereq,
-  addProjectTask,
-  updateProjectTask,
+  getProjectPrereqs,
   updateProjectPrereq,
+
+  // Tasks-related routes
+  addProjectTask,
+  getProjectTasks,
+  updateProjectTask,
 } from "../controllers/project_management_controllers.js";
 
 const router = express.Router();
@@ -28,30 +41,36 @@ router
   .patch(checkPayloadMiddleware, updateProject)
   .delete(checkPayloadMiddleware, deleteProject);
 
-// Routes for project array fields
+// Notes routes
 router
-  .route("/project/:project_id/note")
+  .route("/project/:project_id/notes")
+  .get(checkPayloadMiddleware, getProjectNotes)
   .post(checkPayloadMiddleware, addProjectNote);
 
+// Updates/Logs routes
 router
-  .route("/project/:project_id/update")
+  .route("/project/:project_id/updates")
+  .get(checkPayloadMiddleware, getProjectUpdates)
   .post(checkPayloadMiddleware, addProjectUpdate);
 
+// Prerequisites routes
 router
-  .route("/project/:project_id/prereq")
+  .route("/project/:project_id/prerequisites")
+  .get(checkPayloadMiddleware, getProjectPrereqs)
   .post(checkPayloadMiddleware, addProjectPrereq);
 
 router
-  .route("/project/:project_id/task")
+  .route("/project/:project_id/prerequisites/:prereq_id")
+  .patch(checkPayloadMiddleware, updateProjectPrereq);
+
+// Tasks routes
+router
+  .route("/project/:project_id/tasks")
+  .get(checkPayloadMiddleware, getProjectTasks)
   .post(checkPayloadMiddleware, addProjectTask);
 
-// Routes for updating specific items in arrays
 router
-  .route("/project/:project_id/task/:task_id")
+  .route("/project/:project_id/tasks/:task_id")
   .patch(checkPayloadMiddleware, updateProjectTask);
-
-router
-  .route("/project/:project_id/prereq/:prereq_id")
-  .patch(checkPayloadMiddleware, updateProjectPrereq);
 
 export default router;
