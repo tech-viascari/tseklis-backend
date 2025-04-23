@@ -1,11 +1,21 @@
 import LegalEntities from "../models/LegalEntities.js";
+import GISDocument from "../models/GISDocument.js";
 
 export const getAllLegalEntities = async (req, res) => {
   try {
     let legalEntities = await new LegalEntities().fetchAll();
-    res.status(200).json(legalEntities);
+    const legalEntitiesWithLatestGIS = await Promise.all(
+      legalEntities.map(async (legal_entity) => {
+        const latestGIS = await new GISDocument().fetchLatestGIS(
+          legal_entity.entity_id
+        );
+        legal_entity.latest_GIS = latestGIS;
+        return legal_entity;
+      })
+    );
+    return res.status(200).json(legalEntitiesWithLatestGIS);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Internal Server Error",
       err: error.message,
@@ -37,7 +47,12 @@ export const getLegalEntity = async (req, res) => {
   const { entity_id } = req.params;
   try {
     const entity = await new LegalEntities().fetch({ entity_id });
+
     if (entity) {
+      const latestGIS = await new GISDocument().fetchLatestGIS(
+        entity.entity_id
+      );
+      entity.latest_GIS = latestGIS;
       return res.status(200).json({ entity });
     } else {
       throw Error("Record not found.");
@@ -59,7 +74,7 @@ export const updateLegalEntity = async (req, res) => {
       entity.entity_logo = req.entity_logo;
 
       if (entity) {
-        const updated = await new LegalEntities({...entity, }).update();
+        const updated = await new LegalEntities({ ...entity }).update();
         return res.status(200).json({ updated });
       } else {
         throw Error("Record not found.");

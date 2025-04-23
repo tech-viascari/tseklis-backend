@@ -8,6 +8,7 @@ import {
   getAllEntityGISDocuments,
   getAllGISDocuments,
   getGISDocument,
+  getLatestGIS,
   updateGIS,
   updateGISDocument,
 } from "../controllers/gis_document_controller.js";
@@ -33,6 +34,8 @@ router
 router.route("/generate-gis/:gis_document_id").post(generateGISDocument);
 
 router.route("/get-gis-document/:gis_document_id").get(getGISDocument);
+router.route("/get-latest-gis-document/:entity_id").get(checkPayloadMiddleware, getLatestGIS);
+
 router.route("/update-gis-document/:gis_document_id").post(updateGIS);
 
 export default router;
