@@ -197,25 +197,10 @@ export const generateGISDocument = async (req, res) => {
 };
 
 export const getLatestGIS = async (req, res) => {
-  const companyId = req.params.companyId;
+  const entity_id = req.params.entity_id;
   try {
-    const data = await db("records")
-      .select("*")
-      .where("companyId", companyId)
-      .where("status", "Completed")
-      .orderBy([
-        { column: "recordName", order: "desc" }, // Order by the first column in ascending order
-        { column: "date_filed", order: "desc" }, // Order by the second column in descending order
-      ])
-      .limit(1);
-    // .orderBy("date_filed", "desc")
-    // .limit(1);
-
-    if (data.length == 1) {
-      res.status(200).json(data[0].draftingInput);
-    } else {
-      res.status(200).json(data);
-    }
+    const GISDocuments = await new GISDocument().fetchLatestGIS(entity_id);
+    return res.status(200).json(GISDocuments);
   } catch (e) {
     //returns 500 status code
     res.status(500).json({ error: "Internal Server Error", err: e });

@@ -316,6 +316,22 @@ class GISDocument {
     return gis_document;
   }
 
+  async fetchLatestGIS(entity_id) {
+    const gis_document_ids = await db(DB_NAME)
+      .select("*")
+      .innerJoin(
+        "gis_documents_timestamps",
+        "gis_documents.gis_document_id",
+        "gis_documents_timestamps.gis_document_id"
+      )
+      .where("entity_id", entity_id)
+      .where("status", "Completed")
+      .orderBy("datetime", "desc")
+      .limit(1);
+
+    return gis_document_ids;
+  }
+
   // Add a new record
   async add(status = GISTimestampState) {
     // Exclude the `gis_document_id`, `created_at`,`updated_at` from the insert data
