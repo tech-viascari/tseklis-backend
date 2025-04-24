@@ -258,7 +258,8 @@ class GISDocument {
   async fetchAllFromEntity(entity_id) {
     const gis_documents = await db(DB_NAME)
       .select("*")
-      .where("entity_id", entity_id);
+      .where("entity_id", entity_id)
+      .orderBy("created_at", "desc");
 
     const gisWithTimestamps = await Promise.all(
       gis_documents.map(async (gis_document) => {
