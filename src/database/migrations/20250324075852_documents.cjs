@@ -43,10 +43,10 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
   return knex.schema.dropTableIfExists(`${TABLE_NAME}_timestamps`).then(() => {
-    console.log(`${TABLE_NAME} table dropped`);
+    console.log(`${TABLE_NAME}_timestamps table dropped`);
 
     knex.schema.dropTableIfExists(TABLE_NAME).then(() => {
-      console.log(`${TABLE_NAME}_timestamps table dropped`);
+      console.log(`${TABLE_NAME} table dropped`);
     });
   });
 };
